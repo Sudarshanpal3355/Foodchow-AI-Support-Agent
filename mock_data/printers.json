@@ -1,0 +1,29 @@
+[
+  {
+    "printer_id": "PRN001",
+    "outlet_id": "OUT001",
+    "name": "Kitchen Printer 1",
+    "status": "online",
+    "paper_status": "normal",
+    "connection_status": "connected",
+    "last_successful_print": "2026-08-30T13:40:00"
+  },
+  {
+    "printer_id": "PRN002",
+    "outlet_id": "OUT002",
+    "name": "Kitchen Printer 2",
+    "status": "offline",
+    "paper_status": "low",
+    "connection_status": "disconnected",
+    "last_successful_print": "2026-08-30T12:50:00"
+  },
+  {
+    "printer_id": "PRN003",
+    "outlet_id": "OUT003",
+    "name": "Kitchen Printer 3",
+    "status": "online",
+    "paper_status": "normal",
+    "connection_status": "connected",
+    "last_successful_print": "2026-08-30T13:35:00"
+  }
+]

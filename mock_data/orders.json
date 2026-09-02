@@ -1,0 +1,98 @@
+[
+  {
+    "order_id": "ORD1001",
+    "restaurant_id": "REST001",
+    "outlet_id": "OUT001",
+    "customer_id": "CUS001",
+    "items": [
+      {
+        "item_id": "ITEM001",
+        "name": "Paneer Butter Masala",
+        "quantity": 1,
+        "price": 280
+      },
+      {
+        "item_id": "ITEM002",
+        "name": "Butter Naan",
+        "quantity": 2,
+        "price": 60
+      }
+    ],
+    "total_amount": 400,
+    "status": "confirmed",
+    "payment_status": "paid",
+    "created_at": "2026-08-30T12:15:00"
+  },
+  {
+    "order_id": "ORD1002",
+    "restaurant_id": "REST001",
+    "outlet_id": "OUT001",
+    "customer_id": "CUS002",
+    "items": [
+      {
+        "item_id": "ITEM003",
+        "name": "Veg Biryani",
+        "quantity": 1,
+        "price": 220
+      }
+    ],
+    "total_amount": 220,
+    "status": "pending",
+    "payment_status": "paid",
+    "created_at": "2026-08-30T12:30:00"
+  },
+  {
+    "order_id": "ORD1003",
+    "restaurant_id": "REST002",
+    "outlet_id": "OUT003",
+    "customer_id": "CUS003",
+    "items": [
+      {
+        "item_id": "ITEM004",
+        "name": "Chicken Biryani",
+        "quantity": 1,
+        "price": 320
+      }
+    ],
+    "total_amount": 320,
+    "status": "confirmed",
+    "payment_status": "paid",
+    "created_at": "2026-08-30T13:00:00"
+  },
+  {
+    "order_id": "ORD1004",
+    "restaurant_id": "REST003",
+    "outlet_id": "OUT004",
+    "customer_id": "CUS004",
+    "items": [
+      {
+        "item_id": "ITEM005",
+        "name": "Fish Thali",
+        "quantity": 1,
+        "price": 450
+      }
+    ],
+    "total_amount": 450,
+    "status": "cancelled",
+    "payment_status": "paid",
+    "created_at": "2026-08-30T13:15:00"
+  },
+  {
+    "order_id": "ORD1005",
+    "restaurant_id": "REST001",
+    "outlet_id": "OUT002",
+    "customer_id": "CUS001",
+    "items": [
+      {
+        "item_id": "ITEM006",
+        "name": "Masala Dosa",
+        "quantity": 2,
+        "price": 120
+      }
+    ],
+    "total_amount": 240,
+    "status": "preparing",
+    "payment_status": "paid",
+    "created_at": "2026-08-30T13:30:00"
+  }
+]

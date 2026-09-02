@@ -1,0 +1,30 @@
+[
+  {
+    "outlet_id": "OUT001",
+    "restaurant_id": "REST001",
+    "name": "Spice Garden - Patia",
+    "address": "Patia, Bhubaneswar",
+    "status": "active"
+  },
+  {
+    "outlet_id": "OUT002",
+    "restaurant_id": "REST001",
+    "name": "Spice Garden - Saheed Nagar",
+    "address": "Saheed Nagar, Bhubaneswar",
+    "status": "active"
+  },
+  {
+    "outlet_id": "OUT003",
+    "restaurant_id": "REST002",
+    "name": "Urban Bites - Indiranagar",
+    "address": "Indiranagar, Bengaluru",
+    "status": "active"
+  },
+  {
+    "outlet_id": "OUT004",
+    "restaurant_id": "REST003",
+    "name": "Coastal Kitchen - Puri",
+    "address": "Grand Road, Puri",
+    "status": "active"
+  }
+]

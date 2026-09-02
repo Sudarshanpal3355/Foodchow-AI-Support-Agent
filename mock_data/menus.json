@@ -1,0 +1,29 @@
+[
+  {
+    "menu_id": "MENU001",
+    "restaurant_id": "REST001",
+    "outlet_id": "OUT001",
+    "name": "Spice Garden Main Menu",
+    "status": "published",
+    "version": 12,
+    "last_updated": "2026-08-30T12:00:00"
+  },
+  {
+    "menu_id": "MENU002",
+    "restaurant_id": "REST001",
+    "outlet_id": "OUT002",
+    "name": "Spice Garden Saheed Nagar Menu",
+    "status": "sync_pending",
+    "version": 10,
+    "last_updated": "2026-08-30T11:30:00"
+  },
+  {
+    "menu_id": "MENU003",
+    "restaurant_id": "REST002",
+    "outlet_id": "OUT003",
+    "name": "Urban Bites Menu",
+    "status": "published",
+    "version": 8,
+    "last_updated": "2026-08-30T12:30:00"
+  }
+]

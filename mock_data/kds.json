@@ -1,0 +1,29 @@
+[
+  {
+    "kds_id": "KDS001",
+    "outlet_id": "OUT001",
+    "name": "Kitchen Display 1",
+    "status": "online",
+    "connection_status": "connected",
+    "pending_orders": 2,
+    "last_order_received": "2026-08-30T13:40:00"
+  },
+  {
+    "kds_id": "KDS002",
+    "outlet_id": "OUT002",
+    "name": "Kitchen Display 2",
+    "status": "offline",
+    "connection_status": "disconnected",
+    "pending_orders": 0,
+    "last_order_received": "2026-08-30T12:45:00"
+  },
+  {
+    "kds_id": "KDS003",
+    "outlet_id": "OUT003",
+    "name": "Kitchen Display 3",
+    "status": "online",
+    "connection_status": "connected",
+    "pending_orders": 1,
+    "last_order_received": "2026-08-30T13:38:00"
+  }
+]

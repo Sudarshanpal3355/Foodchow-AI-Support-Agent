@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="theme-color"
+      content="#2563eb"
+    />
+
+    <meta
+      name="description"
+      content="FoodChow AI Support Agent"
+    />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/src/assets/foodchow-mark.svg"
+    />
+
+    <title>
+      FoodChow AI Support Agent
+    </title>
+
+    <script>
+      (() => {
+        const theme =
+          localStorage.getItem(
+            'foodchow-theme'
+          ) || 'light'
+
+        document.documentElement.dataset.theme =
+          theme
+      })()
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script
+      type="module"
+      src="/src/main.jsx"
+    ></script>
+  </body>
+</html>

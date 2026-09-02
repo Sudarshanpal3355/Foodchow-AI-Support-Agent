@@ -1,0 +1,23 @@
+[
+  {
+    "restaurant_id": "REST001",
+    "name": "Spice Garden",
+    "status": "active",
+    "cuisine": "Indian",
+    "city": "Bhubaneswar"
+  },
+  {
+    "restaurant_id": "REST002",
+    "name": "Urban Bites",
+    "status": "active",
+    "cuisine": "Multi-Cuisine",
+    "city": "Bengaluru"
+  },
+  {
+    "restaurant_id": "REST003",
+    "name": "Coastal Kitchen",
+    "status": "active",
+    "cuisine": "Seafood",
+    "city": "Puri"
+  }
+]

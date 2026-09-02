@@ -1,0 +1,26 @@
+[
+  {
+    "account_id": "ACC001",
+    "restaurant_id": "REST001",
+    "email": "admin@spicegarden.example.com",
+    "role": "admin",
+    "status": "active",
+    "security_status": "normal"
+  },
+  {
+    "account_id": "ACC002",
+    "restaurant_id": "REST002",
+    "email": "manager@urbanbites.example.com",
+    "role": "manager",
+    "status": "active",
+    "security_status": "normal"
+  },
+  {
+    "account_id": "ACC003",
+    "restaurant_id": "REST003",
+    "email": "admin@coastalkitchen.example.com",
+    "role": "admin",
+    "status": "locked",
+    "security_status": "requires_verification"
+  }
+]

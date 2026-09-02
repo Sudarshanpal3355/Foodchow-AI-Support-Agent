@@ -1,0 +1,47 @@
+[
+  {
+    "payment_id": "PAY1001",
+    "order_id": "ORD1001",
+    "customer_id": "CUS001",
+    "amount": 400,
+    "status": "success",
+    "method": "UPI",
+    "transaction_id": "TXN1001"
+  },
+  {
+    "payment_id": "PAY1002",
+    "order_id": "ORD1002",
+    "customer_id": "CUS002",
+    "amount": 220,
+    "status": "success",
+    "method": "UPI",
+    "transaction_id": "TXN1002"
+  },
+  {
+    "payment_id": "PAY1003",
+    "order_id": "ORD1003",
+    "customer_id": "CUS003",
+    "amount": 320,
+    "status": "success",
+    "method": "Card",
+    "transaction_id": "TXN1003"
+  },
+  {
+    "payment_id": "PAY1004",
+    "order_id": "ORD1004",
+    "customer_id": "CUS004",
+    "amount": 450,
+    "status": "success",
+    "method": "UPI",
+    "transaction_id": "TXN1004"
+  },
+  {
+    "payment_id": "PAY1005",
+    "order_id": "ORD1005",
+    "customer_id": "CUS001",
+    "amount": 240,
+    "status": "success",
+    "method": "Cash",
+    "transaction_id": "TXN1005"
+  }
+]

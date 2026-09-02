@@ -1,0 +1,30 @@
+[
+  {
+    "customer_id": "CUS001",
+    "name": "Rahul Sharma",
+    "email": "rahul@example.com",
+    "phone": "+919876543210",
+    "status": "active"
+  },
+  {
+    "customer_id": "CUS002",
+    "name": "Priya Das",
+    "email": "priya@example.com",
+    "phone": "+919876543211",
+    "status": "active"
+  },
+  {
+    "customer_id": "CUS003",
+    "name": "Arjun Mehta",
+    "email": "arjun@example.com",
+    "phone": "+919876543212",
+    "status": "active"
+  },
+  {
+    "customer_id": "CUS004",
+    "name": "Neha Patnaik",
+    "email": "neha@example.com",
+    "phone": "+919876543213",
+    "status": "active"
+  }
+]
