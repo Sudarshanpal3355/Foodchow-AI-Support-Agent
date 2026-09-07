@@ -20,18 +20,12 @@ import {
 
 import { Link } from 'react-router-dom'
 
+import api from '../services/api'
+
 async function getAgentActivity() {
-  const response = await fetch(
-    'http://127.0.0.1:8000/api/agent/activity',
-  )
+  const response = await api.get('/api/agent/activity')
 
-  if (!response.ok) {
-    throw new Error(
-      `Unable to load agent activity. HTTP ${response.status}`,
-    )
-  }
-
-  return response.json()
+  return response.data
 }
 
 function AgentActivity() {

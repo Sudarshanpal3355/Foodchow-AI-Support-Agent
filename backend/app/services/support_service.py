@@ -1,7 +1,18 @@
 from datetime import datetime, timezone
 from uuid import uuid4
+import logging
 
-from backend.app.database.mongodb import mongodb
+from pymongo.errors import PyMongoError
+
+from backend.app.database.mongodb import (
+    mark_mongodb_unavailable,
+    mongodb,
+)
+
+
+logger = logging.getLogger(__name__)
+
+_memory_conversations: dict[str, dict] = {}
 
 
 # =========================================================
@@ -165,21 +176,33 @@ def get_conversations():
     """
 
     if mongodb.database is None:
-        return []
-
-    return list(
-        mongodb.database[
-            "conversations"
-        ].find(
-            {},
-            {
-                "_id": 0,
-            },
-        ).sort(
-            "updated_at",
-            -1,
+        return sorted(
+            _memory_conversations.values(),
+            key=lambda item: item.get("updated_at", ""),
+            reverse=True,
         )
-    )
+
+    try:
+        return list(
+            mongodb.database[
+                "conversations"
+            ].find(
+                {},
+                {
+                    "_id": 0,
+                },
+            ).sort(
+                "updated_at",
+                -1,
+            )
+        )
+    except PyMongoError as exc:
+        logger.warning(
+            "MongoDB unavailable while loading conversations: %s",
+            exc,
+        )
+        mark_mongodb_unavailable()
+        return []
 
 
 def get_conversation(
@@ -190,19 +213,27 @@ def get_conversation(
     """
 
     if mongodb.database is None:
-        return None
+        return _memory_conversations.get(conversation_id)
 
-    return mongodb.database[
-        "conversations"
-    ].find_one(
-        {
-            "conversation_id":
-                conversation_id,
-        },
-        {
-            "_id": 0,
-        },
-    )
+    try:
+        return mongodb.database[
+            "conversations"
+        ].find_one(
+            {
+                "conversation_id":
+                    conversation_id,
+            },
+            {
+                "_id": 0,
+            },
+        )
+    except PyMongoError as exc:
+        logger.warning(
+            "MongoDB unavailable while loading conversation: %s",
+            exc,
+        )
+        mark_mongodb_unavailable()
+        return _memory_conversations.get(conversation_id)
 
 
 def create_conversation(
@@ -213,33 +244,19 @@ def create_conversation(
     """
 
     if mongodb.database is None:
-        raise RuntimeError(
-            "MongoDB is not connected."
-        )
+        conversation = _new_conversation(customer_id)
+        _memory_conversations[conversation["conversation_id"]] = conversation
+        return conversation
 
-    timestamp = _now()
+    conversation = _new_conversation(customer_id)
 
-    conversation = {
-        "conversation_id": (
-            f"CONV-{uuid4().hex[:8].upper()}"
-        ),
-
-        "customer_id": customer_id,
-
-        "messages": [],
-
-        "status": "active",
-
-        "created_at": timestamp,
-
-        "updated_at": timestamp,
-    }
-
-    mongodb.database[
-        "conversations"
-    ].insert_one(
-        conversation
-    )
+    try:
+        mongodb.database["conversations"].insert_one(conversation)
+    except PyMongoError as exc:
+        logger.warning("MongoDB unavailable while creating conversation: %s", exc)
+        mark_mongodb_unavailable()
+        _memory_conversations[conversation["conversation_id"]] = conversation
+        return conversation
 
     conversation.pop(
         "_id",
@@ -247,6 +264,18 @@ def create_conversation(
     )
 
     return conversation
+
+
+def _new_conversation(customer_id: str | None = None) -> dict:
+    timestamp = _now()
+    return {
+        "conversation_id": f"CONV-{uuid4().hex[:8].upper()}",
+        "customer_id": customer_id,
+        "messages": [],
+        "status": "active",
+        "created_at": timestamp,
+        "updated_at": timestamp,
+    }
 
 
 # =========================================================
@@ -284,25 +313,37 @@ def add_message_to_conversation(
     """
 
     if mongodb.database is None:
-        raise RuntimeError(
-            "MongoDB is not connected."
+        conversation = _memory_conversations.get(conversation_id)
+        if conversation is None:
+            return None
+        message = _new_message(
+            role,
+            content,
+            intent,
+            confidence,
+            requires_escalation,
+            ticket_id,
+            tools_used,
+            activity,
         )
+        conversation["messages"].append(message)
+        conversation["updated_at"] = _now()
+        return message
 
     # =====================================================
     # BASE MESSAGE
     # =====================================================
 
-    message = {
-        "message_id": (
-            f"MSG-{uuid4().hex[:8].upper()}"
-        ),
-
-        "role": role,
-
-        "content": content,
-
-        "timestamp": _now(),
-    }
+    message = _new_message(
+        role,
+        content,
+        intent,
+        confidence,
+        requires_escalation,
+        ticket_id,
+        tools_used,
+        activity,
+    )
 
     # =====================================================
     # ASSISTANT METADATA
@@ -360,23 +401,44 @@ def add_message_to_conversation(
     # SAVE MESSAGE
     # =====================================================
 
-    result = mongodb.database[
-        "conversations"
-    ].update_one(
-        {
-            "conversation_id":
-                conversation_id,
-        },
-        {
-            "$push": {
-                "messages": message,
+    try:
+        result = mongodb.database[
+            "conversations"
+        ].update_one(
+            {
+                "conversation_id":
+                    conversation_id,
             },
+            {
+                "$push": {
+                    "messages": message,
+                },
 
-            "$set": {
+                "$set": {
+                    "updated_at": _now(),
+                },
+            },
+        )
+    except PyMongoError as exc:
+        logger.warning(
+            "MongoDB unavailable while saving conversation message: %s",
+            exc,
+        )
+        mark_mongodb_unavailable()
+        conversation = _memory_conversations.setdefault(
+            conversation_id,
+            {
+                "conversation_id": conversation_id,
+                "customer_id": None,
+                "messages": [],
+                "status": "active",
+                "created_at": _now(),
                 "updated_at": _now(),
             },
-        },
-    )
+        )
+        conversation["messages"].append(message)
+        conversation["updated_at"] = _now()
+        return message
 
     # =====================================================
     # CONVERSATION NOT FOUND
@@ -385,6 +447,34 @@ def add_message_to_conversation(
     if result.matched_count == 0:
         return None
 
+    return message
+
+
+def _new_message(
+    role: str,
+    content: str,
+    intent: str | None,
+    confidence: float | None,
+    requires_escalation: bool,
+    ticket_id: str | None,
+    tools_used: list[str] | None,
+    activity: list[dict] | None,
+) -> dict:
+    message = {
+        "message_id": f"MSG-{uuid4().hex[:8].upper()}",
+        "role": role,
+        "content": content,
+        "timestamp": _now(),
+    }
+    if role == "assistant":
+        message.update({
+            "intent": intent,
+            "confidence": confidence,
+            "requires_escalation": requires_escalation,
+            "ticket_id": ticket_id,
+            "tools_used": tools_used or [],
+            "activity": activity or [],
+        })
     return message
 
 

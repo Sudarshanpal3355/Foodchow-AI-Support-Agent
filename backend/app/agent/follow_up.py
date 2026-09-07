@@ -1,3 +1,5 @@
+import re
+
 from backend.app.agent.state import AgentState
 
 
@@ -28,6 +30,34 @@ def handle_follow_up(
     intent = state.get(
         "intent"
     )
+
+    user_message = str(
+        state.get("user_message", "")
+    ).strip()
+
+    conversation_context = str(
+        state.get("conversation_context", "")
+    )
+
+    # A previous assistant prompt for an Order ID means that
+    # arbitrary follow-up text should not enter the Gemini path.
+    if (
+        "Please provide your Order ID"
+        in conversation_context
+        and not re.search(
+            r"\bORD-?\d+\b",
+            user_message,
+            re.IGNORECASE,
+        )
+    ):
+        state["intent"] = "payment_issue"
+        state["missing_information"] = ["Order ID"]
+        state["requires_escalation"] = False
+        state["response"] = (
+            "Please provide a valid Order ID, such as ORD-1001, "
+            "so I can check the details of your request."
+        )
+        return state
 
     # =========================================================
     # RESET FOLLOW-UP INFORMATION

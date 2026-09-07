@@ -10,7 +10,13 @@ from backend.app.llm.prompts import SYSTEM_PROMPT
 # =========================================================
 
 client = genai.Client(
-    api_key=settings.GEMINI_API_KEY
+    api_key=settings.GEMINI_API_KEY,
+    http_options=types.HttpOptions(
+        timeout=settings.GEMINI_TIMEOUT_MS,
+        retry_options=types.HttpRetryOptions(
+            attempts=1,
+        ),
+    ),
 )
 
 
@@ -1369,6 +1375,7 @@ STRICT FOODCHOW RULES:
             contents=enhanced_prompt,
             config=types.GenerateContentConfig(
                 system_instruction=instructions,
+                max_output_tokens=256,
             ),
         )
 

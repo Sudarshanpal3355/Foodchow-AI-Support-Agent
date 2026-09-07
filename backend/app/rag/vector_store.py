@@ -1,10 +1,5 @@
 ﻿from pathlib import Path
-
-import chromadb
-
-from backend.app.rag.chunker import (
-    build_knowledge_chunks,
-)
+from functools import lru_cache
 
 from backend.app.rag.embeddings import (
     embed_documents,
@@ -30,14 +25,12 @@ COLLECTION_NAME = "foodchow_knowledge"
 # CHROMA CLIENT
 # =========================================================
 
-CHROMA_PATH.mkdir(
-    parents=True,
-    exist_ok=True,
-)
+@lru_cache(maxsize=1)
+def _get_client():
+    import chromadb
 
-client = chromadb.PersistentClient(
-    path=str(CHROMA_PATH)
-)
+    CHROMA_PATH.mkdir(parents=True, exist_ok=True)
+    return chromadb.PersistentClient(path=str(CHROMA_PATH))
 
 
 # =========================================================
@@ -49,7 +42,7 @@ def get_knowledge_collection():
     Get or create the FoodChow knowledge collection.
     """
 
-    return client.get_or_create_collection(
+    return _get_client().get_or_create_collection(
         name=COLLECTION_NAME,
         metadata={
             "description": (
@@ -68,6 +61,8 @@ def index_knowledge_base() -> dict:
     Build chunks, generate embeddings and store them
     in ChromaDB.
     """
+
+    from backend.app.rag.chunker import build_knowledge_chunks
 
     chunks = build_knowledge_chunks()
 
@@ -143,15 +138,13 @@ def clear_knowledge_collection() -> None:
     Useful when rebuilding the knowledge index.
     """
 
-    global client
-
     try:
-
-        client.delete_collection(
+        _get_client().delete_collection(
             name=COLLECTION_NAME
         )
 
     except Exception:
         pass
 
+    _get_client.cache_clear()
     get_knowledge_collection()

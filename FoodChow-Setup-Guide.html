@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FoodChow AI Support Agent - Setup Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 17mm; }
+  :root { --ink:#17212b; --muted:#536273; --teal:#087f8c; --teal-light:#e7f5f5; --orange:#d86b32; --line:#d9e1e7; }
+  * { box-sizing:border-box; }
+  body { color:var(--ink); font:10.5pt/1.45 "Segoe UI", Arial, sans-serif; margin:0; }
+  header { border-bottom:4px solid var(--teal); padding-bottom:13px; margin-bottom:18px; }
+  .eyebrow { color:var(--teal); font-size:9pt; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+  h1 { font-size:27pt; line-height:1.08; margin:5px 0 7px; }
+  .subtitle { color:var(--muted); font-size:11.5pt; margin:0; }
+  h2 { color:var(--teal); font-size:15pt; margin:21px 0 8px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+  h3 { font-size:11.5pt; margin:13px 0 5px; }
+  p { margin:6px 0 9px; }
+  ul { margin:5px 0 10px 20px; padding:0; }
+  li { margin:3px 0; }
+  code, pre { font-family:Consolas, "Courier New", monospace; }
+  pre { background:#f3f6f8; border:1px solid var(--line); border-left:4px solid var(--teal); border-radius:3px; padding:9px 11px; white-space:pre-wrap; font-size:8.7pt; line-height:1.38; margin:7px 0 11px; }
+  code { background:#f0f3f5; border-radius:2px; padding:1px 3px; font-size:9pt; }
+  .note { background:var(--teal-light); border-left:4px solid var(--teal); padding:9px 11px; margin:10px 0; }
+  .warning { background:#fff3e9; border-left:4px solid var(--orange); padding:9px 11px; margin:10px 0; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .panel { border:1px solid var(--line); padding:9px 11px; border-radius:3px; }
+  .panel strong { color:var(--teal); }
+  table { width:100%; border-collapse:collapse; margin:7px 0 11px; font-size:9.3pt; }
+  th, td { text-align:left; border-bottom:1px solid var(--line); padding:6px 7px; vertical-align:top; }
+  th { background:#eef4f5; color:var(--teal); }
+  .small { color:var(--muted); font-size:8.8pt; }
+  footer { border-top:1px solid var(--line); color:var(--muted); font-size:8.5pt; margin-top:20px; padding-top:7px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">FoodChow Engineering</div>
+  <h1>AI Support Agent<br>Setup Guide</h1>
+  <p class="subtitle">Local development instructions for Windows PowerShell</p>
+</header>
+
+<h2>1. Prerequisites</h2>
+<ul>
+  <li>Python 3.11 or newer</li>
+  <li>Node.js and npm</li>
+  <li>MongoDB Atlas or a local MongoDB server</li>
+  <li>A Gemini API key for AI-generated responses</li>
+</ul>
+
+<h2>2. Configure the backend</h2>
+<p>Run these commands from the repository root:</p>
+<pre>Set-Location "D:\FoodChow AI Support Agent"
+Copy-Item .env.example .env</pre>
+<p>Edit the root <code>.env</code> file with values similar to the following:</p>
+<pre>APP_NAME=FoodChow AI Support Agent
+ENVIRONMENT=development
+DEBUG=true
+BACKEND_HOST=127.0.0.1
+BACKEND_PORT=8000
+FRONTEND_URL=http://localhost:5173
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/?retryWrites=true&amp;w=majority
+MONGODB_DATABASE=foodchow_support
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.6-flash
+JWT_SECRET_KEY=generate_a_long_random_secret
+ACCESS_TOKEN_EXPIRE_MINUTES=60</pre>
+<div class="grid">
+  <div class="panel"><strong>MongoDB Atlas</strong><br>Create a database user, allow your IP in Network Access, and URL-encode special characters in the password.</div>
+  <div class="panel"><strong>Local MongoDB</strong><br>Use <code>MONGODB_URI=mongodb://127.0.0.1:27017</code>. The application selects <code>foodchow_support</code> separately.</div>
+</div>
+<div class="warning"><strong>Credential warning:</strong> Never commit <code>.env</code>. Any credentials previously present in the working copy should be rotated before sharing or deploying: MongoDB password, Gemini API key, and JWT secret.</div>
+
+<h2>3. Install and run the backend</h2>
+<p>Keep the working directory at the repository root when starting Uvicorn; the imports use the <code>backend.app</code> module path.</p>
+<pre>Set-Location "D:\FoodChow AI Support Agent"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r .\backend\requirements.txt
+uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000</pre>
+<p class="small">If PowerShell blocks activation: <code>Set-ExecutionPolicy -Scope Process Bypass</code>, then activate again.</p>
+
+<h2>4. Install and run the frontend</h2>
+<p>Open a second terminal:</p>
+<pre>Set-Location "D:\FoodChow AI Support Agent\frontend"
+npm install
+npm run dev</pre>
+<p>Open <code>http://localhost:5173</code>. The frontend defaults to <code>http://127.0.0.1:8000</code>. For another backend URL, create <code>frontend/.env</code>:</p>
+<pre>VITE_API_BASE_URL=http://127.0.0.1:8000</pre>
+
+<h2>5. Verify the installation</h2>
+<table>
+  <tr><th>Purpose</th><th>URL or command</th></tr>
+  <tr><td>Backend health</td><td><code>http://127.0.0.1:8000/health</code></td></tr>
+  <tr><td>Interactive API documentation</td><td><code>http://127.0.0.1:8000/docs</code></td></tr>
+  <tr><td>Frontend</td><td><code>http://localhost:5173</code></td></tr>
+</table>
+
+<h2>6. Optional mock data and demo accounts</h2>
+<p>Seed the MongoDB collections from the repository's <code>mock_data</code> directory:</p>
+<pre>Set-Location "D:\FoodChow AI Support Agent"
+.\.venv\Scripts\Activate.ps1
+python .\scripts\seed_database.py</pre>
+<div class="warning"><strong>Seeding behavior:</strong> the script clears and reinserts the seeded collections. Do not run it against production data.</div>
+<p>The backend creates these demo users if they do not already exist:</p>
+<table>
+  <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+  <tr><td>Administrator</td><td><code>admin@foodchow.com</code></td><td><code>DemoPassword123</code></td></tr>
+  <tr><td>Support agent</td><td><code>agent@foodchow.com</code></td><td><code>DemoPassword123</code></td></tr>
+</table>
+<p>Change or remove these credentials outside a local demonstration.</p>
+
+<h2>7. Tests and production checks</h2>
+<pre>Set-Location "D:\FoodChow AI Support Agent"
+.\.venv\Scripts\Activate.ps1
+pytest
+
+Set-Location .\frontend
+npm run lint
+npm run build</pre>
+<p>The root <code>docker-compose.yml</code> is currently empty, so Docker Compose is not configured for this project.</p>
+
+<footer>Generated for the FoodChow AI Support Agent repository. Keep secrets in environment variables and outside source control.</footer>
+</body>
+</html>

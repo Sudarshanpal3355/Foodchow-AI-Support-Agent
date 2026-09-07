@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import logo from "../assets/foodchow-logo.png";
@@ -7,6 +7,8 @@ import logo from "../assets/foodchow-logo.png";
 
 function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/";
 
   const {
     login,
@@ -57,7 +59,7 @@ function Login() {
         form.password
       );
 
-      navigate("/", {
+      navigate(redirectPath === "/admin" ? "/admin" : "/", {
         replace: true,
       });
 

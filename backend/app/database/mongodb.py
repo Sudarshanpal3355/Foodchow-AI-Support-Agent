@@ -38,3 +38,12 @@ def close_mongodb_connection() -> None:
         mongodb.database = None
 
         print("MongoDB connection closed.")
+
+
+def mark_mongodb_unavailable() -> None:
+    """Clear a client after a connection failure so it is not reused."""
+    if mongodb.client is not None:
+        mongodb.client.close()
+
+    mongodb.client = None
+    mongodb.database = None

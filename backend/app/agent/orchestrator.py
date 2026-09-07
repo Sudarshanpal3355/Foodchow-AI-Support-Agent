@@ -12,11 +12,8 @@ from backend.app.agent.tool_runner import execute_tool
 
 from backend.app.database.mongodb import (
     mongodb,
-    connect_to_mongodb,
 )
-
-from backend.app.rag.pipeline import run_rag
-
+from backend.app.core.config import settings
 
 # ============================================================
 # ACTIVITY
@@ -41,6 +38,25 @@ def _record_activity(
         event["details"] = details
 
     activity.append(event)
+
+
+def _fast_chat_response(intent: str | None, entities: dict) -> str:
+    responses = {
+        "payment_issue": "I can help check the payment. Please provide your Order ID, such as ORD-1001.",
+        "refund_issue": "I can help check the refund. Please provide your Order ID, such as ORD-1001.",
+        "order_issue": "Please provide your Order ID, such as ORD-1001, so I can check the order.",
+        "printer_issue": "I can help troubleshoot the printer. Please provide the Printer ID or Outlet ID.",
+        "kds_issue": "I can help troubleshoot the KDS. Please provide the KDS ID or Outlet ID.",
+        "menu_issue": "I can help with the menu. Please provide the Menu ID or Outlet ID.",
+        "restaurant_issue": "I can help check the restaurant. Please provide the Restaurant ID.",
+        "outlet_issue": "I can help check the outlet. Please provide the Outlet ID.",
+        "account_issue": "I can help check the account. Please provide the Account ID or Restaurant ID.",
+        "general_support": "I can help with orders, payments, refunds, menus, printers, KDS, restaurants, outlets, and accounts. What do you need checked?",
+    }
+    return responses.get(
+        intent,
+        "I can help with your FoodChow support request. Please provide a little more detail.",
+    )
 
 
 # ============================================================
@@ -639,20 +655,6 @@ def run_support_agent(
 ) -> AgentState:
 
     # ========================================================
-    # DATABASE
-    # ========================================================
-
-    if mongodb.database is None:
-
-        try:
-            connect_to_mongodb()
-
-        except Exception as exc:
-            print(
-                f"MongoDB connection error: {exc}"
-            )
-
-    # ========================================================
     # MESSAGE
     # ========================================================
 
@@ -796,6 +798,21 @@ def run_support_agent(
         "entities",
         {},
     )
+
+    if settings.FAST_CHAT_MODE and intent not in {
+        "order_issue",
+        "account_issue",
+    }:
+        state["response"] = _fast_chat_response(intent, entities)
+        state["requires_escalation"] = False
+        state["ticket_id"] = None
+        _record_activity(
+            state,
+            step="response",
+            name="fast_chat_response",
+            status="success",
+        )
+        return state
 
     # ========================================================
     # 3. OPERATIONAL TOOLS
@@ -1149,11 +1166,21 @@ def run_support_agent(
                     )
                 )
 
-        rag_result = run_rag(
-            query=rag_query,
-            retrieval_top_k=5,
-            rerank_top_k=3,
-        )
+        if settings.FAST_CHAT_MODE or intent == "order_issue":
+            rag_result = {
+                "success": True,
+                "documents": [],
+                "citations": [],
+                "formatted_citations": [],
+            }
+        else:
+            from backend.app.rag.pipeline import run_rag
+
+            rag_result = run_rag(
+                query=rag_query,
+                retrieval_top_k=5,
+                rerank_top_k=3,
+            )
 
     except Exception as exc:
 

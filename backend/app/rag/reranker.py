@@ -1,4 +1,4 @@
-﻿from sentence_transformers import CrossEncoder
+﻿from functools import lru_cache
 
 
 # =========================================================
@@ -12,9 +12,11 @@ RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 # LOAD RERANKER MODEL
 # =========================================================
 
-reranker = CrossEncoder(
-    RERANKER_MODEL
-)
+@lru_cache(maxsize=1)
+def _get_reranker():
+    from sentence_transformers import CrossEncoder
+
+    return CrossEncoder(RERANKER_MODEL)
 
 
 # =========================================================
@@ -61,7 +63,7 @@ def rerank_documents(
     if not pairs:
         return []
 
-    scores = reranker.predict(
+    scores = _get_reranker().predict(
         pairs
     )
 

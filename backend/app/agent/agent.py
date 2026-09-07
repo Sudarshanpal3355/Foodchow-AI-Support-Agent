@@ -10,7 +10,13 @@ from backend.app.tools.registry import TOOL_DECLARATIONS
 
 
 client = genai.Client(
-    api_key=settings.GEMINI_API_KEY
+    api_key=settings.GEMINI_API_KEY,
+    http_options=types.HttpOptions(
+        timeout=settings.GEMINI_TIMEOUT_MS,
+        retry_options=types.HttpRetryOptions(
+            attempts=1,
+        ),
+    ),
 )
 
 

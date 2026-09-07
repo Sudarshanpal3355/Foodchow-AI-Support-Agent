@@ -58,6 +58,7 @@ function DashboardLayout({
   const {
     user,
     isAuthenticated,
+    isAdmin,
     logout,
   } = useAuth()
 
@@ -1256,19 +1257,15 @@ function DashboardLayout({
                               ================================================= */}
 
                           <MenuLink
-                            to="/admin"
-                            icon={
-                              <ShieldCheck
-                                size={15}
-                              />
-                            }
+                            to="/login?redirect=/admin"
+                            icon={<ShieldCheck size={15} />}
                             title="Admin Console"
-                            description="Manage the entire system"
-                            onClick={() =>
-                              setProfileOpen(
-                                false,
-                              )
+                            description={
+                              isAdmin
+                                ? "Manage the entire system"
+                                : "Administrator access required"
                             }
+                            onClick={() => setProfileOpen(false)}
                           />
 
 
@@ -1277,21 +1274,15 @@ function DashboardLayout({
                               VISIBLE TO LOGGED-IN USERS
                               ================================================= */}
 
-                          <MenuLink
-                            to="/admin/users"
-                            icon={
-                              <Users
-                                size={15}
-                              />
-                            }
-                            title="User Management"
-                            description="Manage users & roles"
-                            onClick={() =>
-                              setProfileOpen(
-                                false,
-                              )
-                            }
-                          />
+                          {isAdmin && (
+                            <MenuLink
+                              to="/admin/users"
+                              icon={<Users size={15} />}
+                              title="User Management"
+                              description="Manage users & roles"
+                              onClick={() => setProfileOpen(false)}
+                            />
+                          )}
 
 
                           {/* =================================================
@@ -1407,7 +1398,7 @@ function DashboardLayout({
                               ================================================= */}
 
                           <MenuLink
-                            to="/admin"
+                            to="/login?redirect=/admin"
                             icon={
                               <ShieldCheck
                                 size={15}

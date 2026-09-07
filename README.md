@@ -872,6 +872,28 @@ ACCESS_TOKEN_EXPIRE_MINUTES=60
 The repository contains .env.example for configuration reference.
 
 💻 Local Installation
+
+### One-command startup
+
+From the repository root, run:
+
+```powershell
+python run.py
+```
+
+The launcher creates or reuses the project Python environment, installs backend and frontend dependencies when needed, creates `.env` from `.env.example` if necessary, starts both services, checks the backend health endpoint, and opens the frontend.
+
+Expected local URLs:
+
+- Frontend: `http://127.0.0.1:5173`
+- Backend API: `http://127.0.0.1:8000`
+- Health check: `http://127.0.0.1:8000/health`
+
+Python 3.11+ and Node.js 18+ are required. MongoDB Atlas and Gemini credentials cannot be generated safely by the launcher. Set `MONGODB_URI` and `GEMINI_API_KEY` in `.env` for database-backed authentication and AI chat; the launcher generates only a local `JWT_SECRET_KEY` when it is missing.
+
+Chat uses `FAST_CHAT_MODE=true` by default so Gemini responses do not wait for the RAG model. Set it to `false` when full knowledge-base retrieval is required. Gemini's SDK enforces a minimum 10-second request deadline; actual successful responses are usually faster, but a sub-second Gemini response cannot be guaranteed over the network.
+
+The legacy two-terminal commands below remain available for manual development, but `python run.py` is the recommended evaluation command.
 1. Clone the Repository
 git clone https://github.com/Sudarshanpal3355/Foodchow-AI-Support-Agent.git
 cd Foodchow-AI-Support-Agent

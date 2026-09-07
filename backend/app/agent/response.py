@@ -726,10 +726,40 @@ def generate_agent_response(
                 f"{verified_order.get('order_id')}"
             )
             print(
-                "Gemini response : ALLOWED"
+                "Gemini response : BYPASSED (verified data response)"
             )
             print("=" * 70)
             print()
+
+            state["response"] = _verified_order_response(
+                verified_order,
+                context_type=context_type,
+            )
+
+            return state
+
+    if intent == "account_issue":
+        account_data = next(
+            (
+                item
+                for item in _get_successful_data(tool_results)
+                if item.get("account_id")
+            ),
+            None,
+        )
+
+        if account_data:
+            account_id = account_data.get("account_id", "the account")
+            status = account_data.get("status", "unknown")
+            role = account_data.get("role")
+            email = account_data.get("email")
+            details = f"Account **{account_id}** is **{status}**."
+            if role:
+                details += f" Role: **{role}**."
+            if email:
+                details += f" Email: **{email}**."
+            state["response"] = details
+            return state
 
     # =====================================================
     # RAG
@@ -955,16 +985,9 @@ STRICT RULES:
 
                 return state
 
-            # -------------------------------------------------
-            # For maximum safety, use deterministic response
-            # for verified orders too.
-            # -------------------------------------------------
-
-            state["response"] = _verified_order_response(
-                verified_order,
-                context_type=context_type,
-            )
-
+            # Gemini generated the final wording using the
+            # verified operational order data above.
+            state["response"] = response
             return state
 
     # =====================================================

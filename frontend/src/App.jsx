@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 
 import { AppProvider } from "./context/AppContext";
+import { useAuth } from "./context/AuthContext";
 
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -53,6 +54,24 @@ function DashboardRoutes() {
       <Outlet />
     </DashboardLayout>
   );
+}
+
+function AdminRoutes() {
+  const { loading, isAuthenticated, isAdmin } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen grid place-items-center">Checking access...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login?redirect=/admin" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/login?redirect=/admin" replace />;
+  }
+
+  return <Outlet />;
 }
 
 
@@ -173,30 +192,15 @@ function App() {
               ADMIN CONSOLE
               ================================================== */}
 
-          <Route
-            path="/admin"
-            element={<AdminDashboard />}
-          />
-          <Route 
-            path="/admin/users" element={<AdminUsers />} 
-          />
-          <Route 
-            path="/admin/roles" element={<AdminRoles />} 
-          />
-          <Route 
-            path="/admin/approvals" element={<AdminApprovals />} 
-          />
-          <Route 
-            path="/admin/system" element={<AdminSystem />} 
-          />
-          <Route
-            path="/admin/integrations"
-            element={<AdminIntegrations />}
-          />
-          <Route
-            path="/admin/security"
-            element={<AdminSecurity />}
-          />  
+          <Route element={<AdminRoutes />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/roles" element={<AdminRoles />} />
+            <Route path="/admin/approvals" element={<AdminApprovals />} />
+            <Route path="/admin/system" element={<AdminSystem />} />
+            <Route path="/admin/integrations" element={<AdminIntegrations />} />
+            <Route path="/admin/security" element={<AdminSecurity />} />
+          </Route>
 
 
           {/* ==================================================

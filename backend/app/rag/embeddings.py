@@ -1,4 +1,4 @@
-﻿from sentence_transformers import SentenceTransformer
+﻿from functools import lru_cache
 
 
 # =========================================================
@@ -12,9 +12,11 @@ EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 # LOAD EMBEDDING MODEL
 # =========================================================
 
-_embedding_model = SentenceTransformer(
-    EMBEDDING_MODEL_NAME
-)
+@lru_cache(maxsize=1)
+def _get_embedding_model():
+    from sentence_transformers import SentenceTransformer
+
+    return SentenceTransformer(EMBEDDING_MODEL_NAME)
 
 
 # =========================================================
@@ -32,7 +34,7 @@ def embed_documents(
     if not texts:
         return []
 
-    embeddings = _embedding_model.encode(
+    embeddings = _get_embedding_model().encode(
         texts,
         normalize_embeddings=True,
         show_progress_bar=False,
@@ -55,7 +57,7 @@ def embed_query(
     if not query or not query.strip():
         return []
 
-    embedding = _embedding_model.encode(
+    embedding = _get_embedding_model().encode(
         query,
         normalize_embeddings=True,
         show_progress_bar=False,
@@ -73,4 +75,4 @@ def get_embedding_dimension() -> int:
     Return the dimensionality of the embedding model.
     """
 
-    return _embedding_model.get_embedding_dimension()
+    return _get_embedding_model().get_embedding_dimension()
